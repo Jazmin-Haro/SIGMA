@@ -1,0 +1,412 @@
+{
+  "info": {
+    "name": "CREAN — Módulo B: Comodatos API",
+    "description": "Colección completa de endpoints REST para el Módulo B del Sistema CREAN.\nSecretaría de Desarrollo Rural · Nayarit · 2026\n\nINSTRUCCIONES:\n1. Importar esta colección en Postman\n2. Configurar la variable BASE_URL si cambias el puerto\n3. Primero ejecutar POST /auth/login para obtener el token\n4. El token se guarda automáticamente en {{TOKEN}}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:3001/api" },
+    { "key": "TOKEN",    "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Salud del Servidor",
+      "item": [{
+        "name": "GET /health",
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:3001/health"
+        }
+      }]
+    },
+    {
+      "name": "1. Autenticación",
+      "item": [
+        {
+          "name": "POST Login (obtener token)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res.token) {",
+                "  pm.collectionVariables.set('TOKEN', res.token);",
+                "  console.log('Token guardado correctamente');",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{BASE_URL}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin2026!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET Perfil del usuario",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/auth/perfil"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Dashboard",
+      "item": [{
+        "name": "GET Resumen general",
+        "request": {
+          "method": "GET",
+          "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+          "url": "{{BASE_URL}}/dashboard"
+        }
+      }]
+    },
+    {
+      "name": "3. Maquinaria",
+      "item": [
+        {
+          "name": "GET Toda la maquinaria",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/maquinaria"
+          }
+        },
+        {
+          "name": "GET Maquinaria disponible",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/maquinaria?estado=disponible", "query": [{ "key": "estado", "value": "disponible" }] }
+          }
+        },
+        {
+          "name": "GET Maquinaria por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/maquinaria/1"
+          }
+        },
+        {
+          "name": "POST Crear maquinaria",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/maquinaria",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero_economico\": \"T050\",\n  \"tipo_equipo\": \"Tractor\",\n  \"marca\": \"NEW HOLLAND\",\n  \"modelo\": \"7610S 4WD\",\n  \"serie\": \"S508999Z\",\n  \"num_motor\": \"8129000\",\n  \"horas_actuales\": 500,\n  \"ubicacion\": \"CREAN\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT Actualizar estado maquinaria",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/maquinaria/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_operativo\": \"disponible\",\n  \"horas_actuales\": 1250,\n  \"ubicacion\": \"CREAN\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE Eliminar maquinaria",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/maquinaria/99"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Solicitudes",
+      "item": [
+        {
+          "name": "GET Todas las solicitudes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/solicitudes"
+          }
+        },
+        {
+          "name": "GET Solicitudes pendientes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/solicitudes?estado=pendiente", "query": [{ "key": "estado", "value": "pendiente" }] }
+          }
+        },
+        {
+          "name": "POST Crear solicitud",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/solicitudes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"folio\": \"CEDER/2026/045\",\n  \"nombre_productor\": \"C. IGNACIO AMAYA MELÉNDEZ\",\n  \"telefono\": \"311 234 5678\",\n  \"ejido\": \"EJIDO SANTIAGO IXCUINTLA\",\n  \"municipio\": \"SANTIAGO IXCUINTLA\",\n  \"superficie_ha\": 15.5,\n  \"cultivo\": \"TABACO\",\n  \"equipos_solicitados\": \"1 TRACTOR 7610S 4WD PARA TRASLADO DE SARTAS\",\n  \"num_beneficiarios\": 12,\n  \"fecha_solicitud\": \"2026-03-05\",\n  \"registrado_por\": \"LIZ\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH Aprobar solicitud",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/solicitudes/1/estado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"aprobada\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH Rechazar solicitud",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/solicitudes/1/estado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"rechazada\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Comodatos",
+      "item": [
+        {
+          "name": "GET Todos los comodatos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/comodatos"
+          }
+        },
+        {
+          "name": "POST Crear comodato",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/comodatos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fk_solicitud\": 1,\n  \"fk_maquinaria\": 8,\n  \"numero_economico_maq\": \"T040\",\n  \"descripcion_maquinaria\": \"1 (UNO) TRACTOR MARCA NEW HOLLAND, MODELO 7610S 4WD, CON NÚMERO ECONÓMICO T040, NÚMERO DE SERIE S508874M Y NÚMERO DE MOTOR 8123519, CON 1,050 HORAS REGISTRADAS EN EL HORÓMETRO\",\n  \"nombre_comodatario\": \"C. IGNACIO AMAYA MELÉNDEZ\",\n  \"telefono\": \"311 234 5678\",\n  \"ejido\": \"EJIDO SANTIAGO IXCUINTLA\",\n  \"municipio\": \"SANTIAGO IXCUINTLA\",\n  \"cultivo\": \"TABACO\",\n  \"superficie_ha\": 15.5,\n  \"num_beneficiarios\": 12,\n  \"fecha_entrega\": \"2026-03-06\",\n  \"fecha_devolucion_esperada\": \"2026-03-20\",\n  \"dias_prestamo\": 14,\n  \"oficio_comodato\": \"CREAN/MAQ/033/2026\",\n  \"horas_entrega\": 1050,\n  \"registrado_por\": \"LIZ\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH Finalizar comodato",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/comodatos/1/estado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"finalizado\",\n  \"fecha_devolucion_real\": \"2026-03-18\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Entregas",
+      "item": [
+        {
+          "name": "GET Todas las entregas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/entregas"
+          }
+        },
+        {
+          "name": "POST Registrar entrega",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/entregas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fk_comodato\": 1,\n  \"fk_maquinaria\": 8,\n  \"numero_economico\": \"T040\",\n  \"fecha_entrega\": \"2026-03-06T10:00:00\",\n  \"nombre_receptor\": \"C. IGNACIO AMAYA MELÉNDEZ\",\n  \"cargo_receptor\": \"PRODUCTOR DE TABACO\",\n  \"ubicacion_entrega\": \"EJIDO SANTIAGO IXCUINTLA, MUNICIPIO SANTIAGO IXCUINTLA\",\n  \"horas_entrega\": 1050,\n  \"estado_motor\": \"bueno\",\n  \"estado_llantas\": \"bueno\",\n  \"estado_asiento\": \"bueno\",\n  \"nivel_combustible\": \"lleno\",\n  \"rayones\": false,\n  \"registrado_por\": \"LIZ\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Devoluciones",
+      "item": [
+        {
+          "name": "GET Todas las devoluciones",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/devoluciones"
+          }
+        },
+        {
+          "name": "POST Registrar devolución sin daños",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/devoluciones",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fk_comodato\": 1,\n  \"fk_maquinaria\": 8,\n  \"numero_economico\": \"T040\",\n  \"fecha_devolucion\": \"2026-03-18T09:00:00\",\n  \"horas_regreso\": 1206,\n  \"tipo_devolucion\": \"voluntaria\",\n  \"tiene_danos\": false,\n  \"estado_cierre\": \"conforme\",\n  \"estado_motor\": \"bueno\",\n  \"estado_llantas\": \"bueno\",\n  \"nivel_combustible\": \"1/2\",\n  \"registrado_por\": \"LIZ\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Registrar devolución CON daños",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/devoluciones",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fk_comodato\": 1,\n  \"fk_maquinaria\": 8,\n  \"numero_economico\": \"T040\",\n  \"fecha_devolucion\": \"2026-03-18T09:00:00\",\n  \"horas_regreso\": 1206,\n  \"tipo_devolucion\": \"voluntaria\",\n  \"tiene_danos\": true,\n  \"requiere_mantenimiento\": true,\n  \"estado_cierre\": \"con_danos\",\n  \"estado_motor\": \"regular\",\n  \"descripcion_danos\": \"Golpe en guardafango derecho y fuga de aceite hidráulico\",\n  \"registrado_por\": \"LIZ\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Fallas",
+      "item": [
+        {
+          "name": "GET Todas las fallas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/fallas"
+          }
+        },
+        {
+          "name": "GET Fallas pendientes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/fallas?estado=pendiente", "query": [{ "key": "estado", "value": "pendiente" }] }
+          }
+        },
+        {
+          "name": "POST Reportar falla",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/fallas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fk_maquinaria\": 8,\n  \"numero_economico\": \"T040\",\n  \"tipo\": \"hidraulica\",\n  \"urgencia\": \"alta\",\n  \"descripcion\": \"Fuga de aceite hidráulico en cilindro del levante del implemento. El equipo no puede levantar la rastra.\",\n  \"origen\": \"devolucion\",\n  \"reportado_por\": \"LIZ\",\n  \"fecha_reporte\": \"2026-03-18\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH Cambiar estado falla",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/fallas/1/estado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"en_proceso\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Mantenimiento",
+      "item": [
+        {
+          "name": "GET Todas las órdenes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": "{{BASE_URL}}/mantenimientos"
+          }
+        },
+        {
+          "name": "POST Crear orden de mantenimiento",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/mantenimientos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fk_maquinaria\": 8,\n  \"fk_falla\": 1,\n  \"numero_economico\": \"T040\",\n  \"tipo_manto\": \"correctivo\",\n  \"descripcion\": \"Reparación de fuga en cilindro hidráulico del levante. Cambio de sellos y revisión general del sistema hidráulico.\",\n  \"taller\": \"TALLER MECÁNICO CREAN\",\n  \"tecnico\": \"VÍCTOR RUIZ\",\n  \"costo_estimado\": 3500.00,\n  \"fecha_inicio\": \"2026-03-19\",\n  \"fecha_fin_estimada\": \"2026-03-22\",\n  \"repuestos_usados\": \"Kit de sellos hidráulicos NH, aceite hidráulico 10L\",\n  \"registrado_por\": \"LIZ\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH Terminar mantenimiento",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/mantenimientos/1/terminar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"costo_real\": 3200.00,\n  \"observaciones\": \"Se reemplazaron sellos y se realizó purga del sistema. Equipo operando correctamente.\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
